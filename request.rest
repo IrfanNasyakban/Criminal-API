@@ -1,0 +1,99 @@
+
+// Create a Login
+POST http://localhost:5000/admin
+Content-Type: application/json
+
+{
+    "name": "Irvan Na",
+    "email": "irvanna@gmail.com",
+    "password": "irvan123",
+    "confPassword": "irvan123",
+    "role": "admin"
+}
+
+###
+// Get all akun Login
+GET http://localhost:5000/admin
+
+###
+// Get a akun Login by Id
+GET http://localhost:5000/admin/96cfaf45-20a1-4109-b284-624064b70fa3
+
+###
+// Update akun Login
+PATCH http://localhost:5000/admin/96cfaf45-20a1-4109-b284-624064b70fa3
+Content-Type: application/json
+
+{
+    "name": "irvan Update",
+    "email": "irvan@gmail.com",
+    "password": "irvan123",
+    "confPassword": "irvan123",
+    "role": "user"
+}
+
+###
+// Delete akun Login User
+DELETE http://localhost:5000/admin/ca530192-9941-4515-ab3b-92c2c41e76f3
+
+###
+// Login sebagai Admin
+POST http://localhost:5000/login
+Content-Type: application/json
+
+{
+    "email": "irvanna@gmail.com",
+    "password": "irvan123"
+}
+
+###
+// Login sebagai User
+POST http://localhost:5000/login
+Content-Type: application/json
+
+{
+    "email": "irvan@gmail.com",
+    "password": "irvan123"
+}
+
+
+###
+// Login User
+GET http://localhost:5000/me
+
+###
+// LogOut User
+DELETE http://localhost:5000/logout
+
+
+###
+GET http://localhost:5000/users
+
+###
+GET http://localhost:5000/users?search_query=john&page=0&limit=10
+
+###
+GET http://localhost:5000/users/1
+
+###
+POST http://localhost:5000/usersdd
+Content-Type: application/json
+
+{
+    "nama": "rizal",
+    "gender": "laki-laki",
+    "tindakan": "jambret"
+}
+
+###
+PATCH http://localhost:5000/users/5
+Content-Type: application/json
+
+{
+    "nama": "irfan nasyakban",
+    "gender": "laki-laki",
+    "tindakan": "merampok bank"
+}
+
+###
+DELETE http://localhost:5000/users/5
