@@ -1,11 +1,10 @@
-import user from "../models/UserModel.js";
+import criminal from "../models/CriminalModel.js";
 import Login from "../models/LoginModel.js"
 import path from "path"
 import fs from "fs"
-import { Op } from "Sequelize"
-import { response } from "express";
+import { Op } from "sequelize"
 
-export const getUsers = async (req, res) => {
+export const getCriminals = async (req, res) => {
     try {
         const page = parseInt(req.query.page) || 0
         const limit = parseInt(req.query.limit) || 10
@@ -13,7 +12,7 @@ export const getUsers = async (req, res) => {
         const offset = limit * page
 
         if (req.role === "admin") {
-            const totalRows = await user.count({
+            const totalRows = await criminal.count({
                 where: {
                     [Op.or]: [{
                         nama: {
@@ -27,7 +26,7 @@ export const getUsers = async (req, res) => {
                 }
             })
             const totalPage = Math.ceil(totalRows / limit)
-            const result = await user.findAll({
+            const result = await criminal.findAll({
                 attributes: ['uuid', 'nama', 'gender', 'tindakan', 'image', 'url'],
                 include: [{
                     model: Login,
@@ -58,7 +57,7 @@ export const getUsers = async (req, res) => {
                 totalPage: totalPage
             })
         } else {
-            const totalRows = await user.count({
+            const totalRows = await criminal.count({
                 where: {
                     userId: req.userId,
                     [Op.or]: [{
@@ -73,7 +72,7 @@ export const getUsers = async (req, res) => {
                 }
             })
             const totalPage = Math.ceil(totalRows / limit)
-            const result = await user.findAll({
+            const result = await criminal.findAll({
                 attributes: ['uuid', 'nama', 'gender', 'tindakan', 'image', 'url'],
                 where: {
                     userId: req.userId,
@@ -110,21 +109,21 @@ export const getUsers = async (req, res) => {
     }
 }
 
-export const getUserById = async (req, res) => {
+export const getCriminalById = async (req, res) => {
 
     try {
-        const User = await user.findOne({
+        const Criminal = await criminal.findOne({
             where: {
                 uuid: req.params.id
             }
         });
-        if (!User) return res.status(404).json({ msg: "Data tidak ditemukan" });
+        if (!Criminal) return res.status(404).json({ msg: "Data tidak ditemukan" });
         let response;
         if (req.role === "admin") {
-            response = await user.findOne({
+            response = await criminal.findOne({
                 attributes: ['uuid', 'nama', 'gender', 'tindakan', 'image', 'url'],
                 where: {
-                    id: User.id
+                    id: Criminal.id
                 },
                 include: [{
                     model: Login,
@@ -132,10 +131,10 @@ export const getUserById = async (req, res) => {
                 }]
             });
         } else {
-            response = await user.findOne({
+            response = await criminal.findOne({
                 attributes: ['uuid', 'nama', 'gender', 'tindakan', 'image', 'url'],
                 where: {
-                    [Op.and]: [{ id: User.id }, { userId: req.userId }]
+                    [Op.and]: [{ id: Criminal.id }, { userId: req.userId }]
                 },
                 include: [{
                     model: Login,
@@ -149,7 +148,7 @@ export const getUserById = async (req, res) => {
     }
 }
 
-export const createUser = async (req, res) => {
+export const createCriminal = async (req, res) => {
     if (req.files === null) return res.status(400).json({ msg: "No File Uploaded" })
     const nama = req.body.nama
     const gender = req.body.gender
@@ -168,7 +167,7 @@ export const createUser = async (req, res) => {
     file.mv(`./public/images/${fileName}`, async (err) => {
         if (err) return res.status(500).json({ msg: err.message })
         try {
-            await user.create({
+            await criminal.create({
                 nama: nama,
                 gender: gender,
                 tindakan: tindakan,
@@ -185,17 +184,17 @@ export const createUser = async (req, res) => {
     })
 }
 
-export const updateUser = async (req, res) => {
-    const User = await user.findOne({
+export const updateCriminal = async (req, res) => {
+    const Criminal = await criminal.findOne({
         where: {
             uuid: req.params.id
         }
     })
 
-    if (!User) return res.status(404).json({ msg: "No Data Found" })
+    if (!Criminal) return res.status(404).json({ msg: "No Data Found" })
     let fileName = ""
     if (req.files === null) {
-        fileName = User.image
+        fileName = Criminal.image
     } else {
         const file = req.files.file
         const fileSize = file.data.length
@@ -207,7 +206,7 @@ export const updateUser = async (req, res) => {
 
         if (fileSize > 5000000) return res.status(422).json({ msg: "Image must be less than 5 MB" })
 
-        const filepath = `./public/images/${User.image}`
+        const filepath = `./public/images/${Criminal.image}`
         fs.unlinkSync(filepath)
 
         file.mv(`./public/images/${fileName}`, (err) => {
@@ -223,7 +222,7 @@ export const updateUser = async (req, res) => {
 
     try {
         if (req.role === "admin") {
-            await user.update({
+            await criminal.update({
                 nama: nama,
                 gender: gender,
                 tindakan: tindakan,
@@ -232,13 +231,13 @@ export const updateUser = async (req, res) => {
             },
                 {
                     where: {
-                        id: User.id
+                        id: Criminal.id
                     }
                 })
 
         } else {
-            if (req.userId !== User.userId) return res.status(403).json({ msg: "Akses terlarang" });
-            await user.update({
+            if (req.userId !== Criminal.userId) return res.status(403).json({ msg: "Akses terlarang" });
+            await criminal.update({
                 nama: nama,
                 gender: gender,
                 tindakan: tindakan,
@@ -247,7 +246,7 @@ export const updateUser = async (req, res) => {
             },
                 {
                     where: {
-                        [Op.and]: [{ id: User.id }, { userId: req.userId }]
+                        [Op.and]: [{ id: Criminal.id }, { userId: req.userId }]
                     }
                 });
         }
@@ -257,29 +256,29 @@ export const updateUser = async (req, res) => {
     }
 }
 
-export const deleteUser = async (req, res) => {
-    const User = await user.findOne({
+export const deleteCriminal = async (req, res) => {
+    const Criminal = await criminal.findOne({
         where: {
             uuid: req.params.id
         }
     })
 
-    if (!User) return res.status(404).json({ msg: "No Data Found" })
+    if (!Criminal) return res.status(404).json({ msg: "No Data Found" })
     try {
-        const filepath = `./public/images/${User.image}`
+        const filepath = `./public/images/${Criminal.image}`
         fs.unlinkSync(filepath)
         if (req.role === "admin") {
-            await user.destroy({
+            await criminal.destroy({
                 where: {
-                    id: User.id
+                    id: Criminal.id
                 }
             })
         } else {
-            if (req.userId !== User.userId) return res.status(403).json({ msg: "Akses terlarang" });
-            await user.destroy(
+            if (req.userId !== Criminal.userId) return res.status(403).json({ msg: "Akses terlarang" });
+            await criminal.destroy(
                 {
                     where: {
-                        [Op.and]: [{ id: User.id }, { userId: req.userId }]
+                        [Op.and]: [{ id: Criminal.id }, { userId: req.userId }]
                     }
                 });
         }

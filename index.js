@@ -1,7 +1,7 @@
 import express from "express"
 import FileUpload from "express-fileupload"
 import cors from "cors"
-import UserRouter from "./routes/UserRoute.js"
+import CriminalRouter from "./routes/CriminalRoute.js"
 import session from "express-session"
 import dotenv from "dotenv"
 import db from "./config/database.js"
@@ -38,7 +38,7 @@ app.use(session({
 app.use(express.json())
 app.use(FileUpload())
 app.use(express.static("public"))
-app.use(UserRouter)
+app.use(CriminalRouter)
 app.use(LoginRoute)
 app.use(AuthRoute)
 

@@ -4,7 +4,7 @@ import Login from "./LoginModel.js"
 
 const {DataTypes} = Sequelize;
 
-const user = db.define('users',{
+const criminal = db.define('criminals',{
     uuid:{
         type: DataTypes.STRING,
         defaultValue: DataTypes.UUIDV4,
@@ -29,7 +29,11 @@ const user = db.define('users',{
     freezeTableName:true
 })
 
-Login.hasMany(user);
-user.belongsTo(Login, {foreignKey: 'userId'})
+Login.hasMany(criminal);
+criminal.belongsTo(Login, {foreignKey: 'userId'})
 
-export default user;
+export default criminal;
+
+(async () => {
+    await db.sync()
+})()

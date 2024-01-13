@@ -47,3 +47,7 @@ const Login = db.define('login',{
 })
 
 export default Login;
+
+(async () => {
+    await db.sync()
+})()
